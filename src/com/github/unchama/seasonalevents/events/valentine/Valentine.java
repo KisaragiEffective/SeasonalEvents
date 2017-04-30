@@ -14,6 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -71,7 +72,9 @@ public class Valentine implements Listener {
 	@EventHandler
 	public void onEntityExplode(EntityExplodeEvent event) {
 		try {
-			killEvent(event.getEntity(), event.getEntity().getLocation());
+			if (event.getEntity() instanceof Monster && event.getEntity().isDead()) {
+				killEvent(event.getEntity(), event.getEntity().getLocation());
+			}
 		} catch (NullPointerException e) {
 		}
 	}
@@ -176,8 +179,7 @@ public class Valentine implements Listener {
 		List<String> lore = new ArrayList<String>();
 		lore.add("");
 		lore.add(ChatColor.RESET + "" + ChatColor.GRAY + "リア充を爆発させて奪い取った。");
-		lore.add(ChatColor.RESET + "" + ChatColor.GRAY + "相手への愛が籠められている。");
-		lore.add(ChatColor.RESET + "" + ChatColor.GRAY + "食べるとステータスが変化する。");
+		lore.add(ChatColor.RESET + "" + ChatColor.GRAY + "食べると一定時間ステータスが変化する。");
 		lore.add(ChatColor.RESET + "" + ChatColor.GRAY + "賞味期限を超えると効果が無くなる。");
 		lore.add("");
 		lore.add(ChatColor.RESET + "" + ChatColor.DARK_GREEN + "賞味期限：" + FINISHDISP);
@@ -265,7 +267,7 @@ public class Valentine implements Listener {
 		List<String> lore = new ArrayList<String>();
 		lore.add("");
 		lore.add(ChatColor.RESET + "" + ChatColor.GRAY + "手作りのチョコチップクッキー。");
-		lore.add(ChatColor.RESET + "" + ChatColor.GRAY + "食べるとステータスが変化する。");
+		lore.add(ChatColor.RESET + "" + ChatColor.GRAY + "食べると一定時間ステータスが変化する。");
 		lore.add(ChatColor.RESET + "" + ChatColor.GRAY + "賞味期限を超えると効果が無くなる。");
 		lore.add("");
 		lore.add(ChatColor.RESET + "" + ChatColor.DARK_GREEN + "賞味期限：" + FINISHDISP);
