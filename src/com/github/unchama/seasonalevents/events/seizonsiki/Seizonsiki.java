@@ -108,7 +108,7 @@ public class Seizonsiki implements Listener {
 		PlayerData pd = SeichiAssist.playermap.get(uuid);
 		Mana mana = pd.activeskilldata.mana;
 
-		double max = mana.calcMaxManaOnly(pd.level);
+		double max = mana.calcMaxManaOnly(player, pd.level);
 		mana.increaseMana(max * 0.1, player, pd.level);
 		player.playSound(player.getLocation(),Sound.ENTITY_WITCH_DRINK, 1.0F, 1.2F);
 	}
