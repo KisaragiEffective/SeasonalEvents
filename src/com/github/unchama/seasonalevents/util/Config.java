@@ -47,4 +47,40 @@ public class Config {
 	public String getWikiAddr() {
 		return config.getString("wiki");
 	}
+
+	/**
+	 * イベントドロップ終了日を指定します。(西暦4桁-月2桁-日付2桁)
+	 *
+	 * @return イベントドロップ終了日 (西暦4桁-月2桁-日付2桁)
+	 */
+	public String getDropFinishDay() {
+		return config.getString("DropFinishDay");
+	}
+
+	/**
+	 * イベント終了日を取得します。(西暦4桁-月2桁-日付2桁)
+	 *
+	 * @return イベント終了日 (西暦4桁-月2桁-日付2桁)
+	 */
+	public String getEventFinishDay() {
+		return config.getString("EventFinishDay");
+	}
+
+	/**
+	 * イベントドロップ終了日(表示用)を取得します。(西暦4桁/月2桁/日付2桁)
+	 *
+	 * @return イベントドロップ終了日(表示用) (西暦4桁/月2桁/日付2桁)
+	 */
+	public String getDropFinishDayDisp() {
+		return config.getString("DropFinishDayDisp");
+	}
+
+	/**
+	 * イベント終了日(表示用)を取得します。(西暦4桁/月2桁/日付2桁)
+	 *
+	 * @return イベント終了日(表示用) (西暦4桁/月2桁/日付2桁)
+	 */
+	public String getEventFinishDayDisp() {
+		return config.getString("EventFinishDayDisp");
+	}
 }
