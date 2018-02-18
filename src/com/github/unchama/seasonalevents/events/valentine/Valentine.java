@@ -38,6 +38,7 @@ import com.github.unchama.seichiassist.util.Util;
 
 public class Valentine implements Listener {
 	private static boolean isdrop = false;
+	public static boolean isInEvent = false;
 	private static Config config = SeasonalEvents.config;
 	/*
 	時間に関してだが、Date#beforeは指定した日付よりも前->true 後->false
@@ -59,6 +60,7 @@ public class Valentine implements Listener {
 			if (now.before(finishdate)) {
 				// リスナーを登録
 				parent.getServer().getPluginManager().registerEvents(this, parent);
+				isInEvent = true;
 			}
 			if (now.before(dropdate)) {
 				isdrop = true;
@@ -70,10 +72,11 @@ public class Valentine implements Listener {
 
 	public static SkullMeta playerHeadLore(SkullMeta head) {
 		if (isdrop) {
+			String prefix = DROPDAY.substring(0, 4);
 			List<String> lore = new ArrayList<String>();
 			lore.add("");
 			lore.add(ChatColor.RESET + "" + ChatColor.ITALIC + "" + ChatColor.GREEN + "大切なあなたへ。");
-			lore.add(ChatColor.RESET + "" + ChatColor.ITALIC + "" + ChatColor.UNDERLINE + "" + ChatColor.YELLOW + "Happy Valentine 2017");
+			lore.add(ChatColor.RESET + "" + ChatColor.ITALIC + "" + ChatColor.UNDERLINE + "" + ChatColor.YELLOW + "Happy Valentine " + prefix);
 			head.setLore(lore);
 		}
 		return head;
