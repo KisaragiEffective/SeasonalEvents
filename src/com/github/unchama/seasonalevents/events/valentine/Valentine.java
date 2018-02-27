@@ -2,12 +2,16 @@ package com.github.unchama.seasonalevents.events.valentine;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
+import com.github.unchama.seasonalevents.util.*;
+import com.github.unchama.seasonalevents.util.Config;
+import com.github.unchama.seichiassist.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -34,10 +38,16 @@ import com.github.unchama.seichiassist.util.Util;
 
 public class Valentine implements Listener {
 	private static boolean isdrop = false;
-	private static final String DROPDAY = "2017-02-20";
-	private static final String DROPDAYDISP = "2017/02/19";
-	private static final String FINISH = "2017-02-27";
-	private static final String FINISHDISP = "2017/02/26";
+	private static Config config = SeasonalEvents.config;
+	/*
+	時間に関してだが、Date#beforeは指定した日付よりも前->true 後->false
+	つまり2018-02-20の場合は、2018/02/20 00:00 よりも前ならtrueを返します。
+	鯖再起動は4時なので、その際に判定が行われる関係で2018/02/20 4時までが期限となります。
+	*/
+	private static final String DROPDAY = config.getDropFinishDay();
+	private static final String DROPDAYDISP = config.getDropFinishDayDisp();
+	private static final String FINISH = config.getEventFinishDay();
+	private static final String FINISHDISP = config.getEventFinishDayDisp();
 
 	public Valentine(SeasonalEvents parent) {
 		try {
