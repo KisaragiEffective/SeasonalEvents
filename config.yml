@@ -1,6 +1,10 @@
-﻿dropper: '30'
+﻿#FIXME: number
+#パーセンテージで指定すること。
+dropper: 30.0
+#FIXME: wikiはもう存在しない
 wiki: 'http://seichi.click/d/%c0%ae%a5%be%a5%f3%bc%b0'
 
+#FIXME: 日付のフォーマットが揺れている
 #バレンタインイベント設定
 #以下のすべての日付指定は「西暦4桁-月2桁-日付2桁」で指定してください。
 
@@ -17,3 +21,52 @@ DropFinishDayDisp: "2018/02/19"
 
 #賞味期限等で表示される、バレンタインイベント自体の終了日を指定します。(通常、上記の日付から1日引いたものを指定してください。)
 EventFinishDayDisp: "2018/02/26"
+
+events:
+  #フォーマットは次の通り。~となっているところは適宜設定すること:
+  #```yaml
+  #  イベント名:
+  #    # おなじない
+  #    <<: *default
+  #    # ヒューマンリーダブルな説明
+  #    description: ~
+  #    # イベント特別アイテムの排出日を設定 (任意、ない場合はdrop自体を設けないこと)
+  #    drop:
+  #      # 開始日 (yyyy-MM-dd)
+  #      start: ~
+  #      # 終了日 (yyyy-MM-dd)
+  #      stop: ~
+  #    # イベント自体の開始日
+  #    begin: ~
+  #    # イベント自体の終了日
+  #    end: ~
+  defaults: &default
+    description: "No description provided."
+    begin: ~
+    end: ~
+
+  example:
+    description: "This is an example."
+    drop:
+      start: "1999-12-31"
+      end: "2000-01-01"
+    begin: "1999-12-30"
+    end: "2000-01-02"
+
+  valentine:
+    <<: *default
+    description: "バレンタイン"
+    drop:
+      start: ~
+      stop: ~
+    begin: "2020-02-11"
+    end: "2020-03-01"
+
+  seizon:
+    <<: *default
+    description: "生ゾン式"
+    drop:
+      start: ~
+      stop: ~
+    begin: "2020-01-16"
+    end: "2020-01-22"

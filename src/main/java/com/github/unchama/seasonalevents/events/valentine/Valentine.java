@@ -2,14 +2,8 @@ package com.github.unchama.seasonalevents.events.valentine;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
-import com.github.unchama.seasonalevents.util.*;
 import com.github.unchama.seasonalevents.util.Config;
 import com.github.unchama.seichiassist.*;
 import org.bukkit.Bukkit;
@@ -37,7 +31,7 @@ import com.github.unchama.seasonalevents.SeasonalEvents;
 import com.github.unchama.seichiassist.util.Util;
 
 public class Valentine implements Listener {
-	private static boolean isdrop = false;
+	private static boolean drop = false;
 	public static boolean isInEvent = false;
 	private static Config config = SeasonalEvents.config;
 	/*
@@ -49,7 +43,19 @@ public class Valentine implements Listener {
 	private static final String DROPDAYDISP = config.getDropFinishDayDisp();
 	private static final String FINISH = config.getEventFinishDay();
 	private static final String FINISHDISP = config.getEventFinishDayDisp();
-
+	private static final List<PotionEffect> applyEffects = Arrays.asList(
+			new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 12000, 1),
+			new PotionEffect(PotionEffectType.NIGHT_VISION, 12000, 1),
+			new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 12000, 1),
+			new PotionEffect(PotionEffectType.JUMP, 12000, 1),
+			new PotionEffect(PotionEffectType.REGENERATION, 12000, 1),
+			new PotionEffect(PotionEffectType.SPEED, 12000, 1),
+			new PotionEffect(PotionEffectType.WATER_BREATHING, 12000, 1),
+			new PotionEffect(PotionEffectType.ABSORPTION, 12000, 1),
+			new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 12000, 1),
+			new PotionEffect(PotionEffectType.UNLUCK, 1200, 1));
+	private static final List<String> japaneseEffectName = Arrays.asList(
+			"火炎耐性", "暗視", "耐性", "跳躍力上昇", "再生能力", "移動速度上昇", "水中呼吸", "緩衝吸収", "攻撃力上昇", "不運");
 	public Valentine(SeasonalEvents parent) {
 		try {
 			// イベント開催中か判定
@@ -63,7 +69,7 @@ public class Valentine implements Listener {
 				isInEvent = true;
 			}
 			if (now.before(dropdate)) {
-				isdrop = true;
+				drop = true;
 			}
 		} catch (ParseException e) {
 			e.printStackTrace();
@@ -71,15 +77,19 @@ public class Valentine implements Listener {
 	}
 
 	public static SkullMeta playerHeadLore(SkullMeta head) {
-		if (isdrop) {
-			String prefix = DROPDAY.substring(0, 4);
-			List<String> lore = new ArrayList<String>();
-			lore.add("");
-			lore.add(ChatColor.RESET + "" + ChatColor.ITALIC + "" + ChatColor.GREEN + "大切なあなたへ。");
-			lore.add(ChatColor.RESET + "" + ChatColor.ITALIC + "" + ChatColor.UNDERLINE + "" + ChatColor.YELLOW + "Happy Valentine " + prefix);
-			head.setLore(lore);
+		if (drop) {
+			String year = DROPDAY.substring(0, 4);
+			head.setLore(getSkullLore(year));
 		}
 		return head;
+	}
+
+	private static List<String> getSkullLore(String year) {
+		return Collections.unmodifiableList(Arrays.asList(
+				"",
+				"" + ChatColor.RESET + ChatColor.ITALIC + ChatColor.GREEN + "大切なあなたへ。",
+				"" + ChatColor.RESET + ChatColor.ITALIC + ChatColor.UNDERLINE + ChatColor.YELLOW + "Happy Valentine " + year
+		));
 	}
 
 	@EventHandler
@@ -106,7 +116,7 @@ public class Valentine implements Listener {
 	@EventHandler
 	public void onplayerJoinEvent(PlayerJoinEvent event) {
 		try {
-			if (isdrop) {
+			if (drop) {
 				event.getPlayer().sendMessage(ChatColor.LIGHT_PURPLE + Valentine.DROPDAYDISP + "までの期間限定で、シーズナルイベント『＜ブラックバレンタイン＞リア充 vs 整地民！』を開催しています。");
 				event.getPlayer().sendMessage(ChatColor.LIGHT_PURPLE + "詳しくは下記wikiをご覧ください。");
 				event.getPlayer().sendMessage(ChatColor.DARK_GREEN + "" + ChatColor.UNDERLINE + SeasonalEvents.config.getWikiAddr());
@@ -130,7 +140,7 @@ public class Valentine implements Listener {
 
 	// プレイヤーにクリーパーが倒されたとき発生
 	private void killEvent(Entity entity, Location loc) {
-		if (isdrop) {
+		if (drop) {
 			double dp = SeasonalEvents.config.getDropPer();
 			double rand = new Random().nextInt(100);
 			if (rand < dp) {
@@ -155,26 +165,14 @@ public class Valentine implements Listener {
 
 	// アイテム使用時の処理
 	private void usePrize(Player player) {
-		List<PotionEffect> ef = Arrays.asList(
-				new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 12000, 1),
-				new PotionEffect(PotionEffectType.NIGHT_VISION, 12000, 1),
-				new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 12000, 1),
-				new PotionEffect(PotionEffectType.JUMP, 12000, 1),
-				new PotionEffect(PotionEffectType.REGENERATION, 12000, 1),
-				new PotionEffect(PotionEffectType.SPEED, 12000, 1),
-				new PotionEffect(PotionEffectType.WATER_BREATHING, 12000, 1),
-				new PotionEffect(PotionEffectType.ABSORPTION, 12000, 1),
-				new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 12000, 1),
-				new PotionEffect(PotionEffectType.UNLUCK, 1200, 1));
-		List<String> msg = Arrays.asList(
-				"火炎耐性", "暗視", "耐性", "跳躍力上昇", "再生能力", "移動速度上昇", "水中呼吸", "緩衝吸収", "攻撃力上昇", "不運");
-		int ran = new Random().nextInt(ef.size());
-		if (ran != 9) {
-			player.addPotionEffect(ef.get(ran));
-			player.sendMessage(msg.get(ran) + " IIを奪い取った！あぁ、おいしいなぁ！");
+
+		int ran = new Random().nextInt(applyEffects.size());
+		if (ran != applyEffects.size() - 1) { // UNLUCKではない
+			player.addPotionEffect(applyEffects.get(ran));
+			player.sendMessage(japaneseEffectName.get(ran) + " IIを奪い取った！あぁ、おいしいなぁ！");
 		} else {
-			player.addPotionEffect(ef.get(ran));
-			player.sendMessage(msg.get(ran) + " IIを感じてしまった…はぁ…むなしいなぁ…");
+			player.addPotionEffect(applyEffects.get(ran));
+			player.sendMessage(japaneseEffectName.get(ran) + " IIを感じてしまった…はぁ…むなしいなぁ…");
 		}
 		player.playSound(player.getLocation(), Sound.ENTITY_WITCH_DRINK, 1.0F, 1.2F);
 	}
@@ -189,15 +187,15 @@ public class Valentine implements Listener {
 	}
 
 	private List<String> getPrizeLore() {
-		List<String> lore = new ArrayList<String>();
-		lore.add("");
-		lore.add(ChatColor.RESET + "" + ChatColor.GRAY + "リア充を爆発させて奪い取った。");
-		lore.add(ChatColor.RESET + "" + ChatColor.GRAY + "食べると一定時間ステータスが変化する。");
-		lore.add(ChatColor.RESET + "" + ChatColor.GRAY + "賞味期限を超えると効果が無くなる。");
-		lore.add("");
-		lore.add(ChatColor.RESET + "" + ChatColor.DARK_GREEN + "賞味期限：" + FINISHDISP);
-		lore.add(ChatColor.RESET + "" + ChatColor.AQUA + "ステータス変化（10分）" + ChatColor.GRAY + " （期限内）");
-		return lore;
+		return Collections.unmodifiableList(Arrays.asList(
+				"",
+				ChatColor.RESET + "" + ChatColor.GRAY + "リア充を爆発させて奪い取った。",
+				ChatColor.RESET + "" + ChatColor.GRAY + "食べると一定時間ステータスが変化する。",
+				ChatColor.RESET + "" + ChatColor.GRAY + "賞味期限を超えると効果が無くなる。",
+				"",
+				ChatColor.RESET + "" + ChatColor.DARK_GREEN + "賞味期限：" + FINISHDISP,
+				ChatColor.RESET + "" + ChatColor.AQUA + "ステータス変化（10分）" + ChatColor.GRAY + " （期限内）"
+		));
 	}
 
 	// チョコレート配布
@@ -215,29 +213,33 @@ public class Valentine implements Listener {
 		if (!item.hasItemMeta() || !item.getItemMeta().hasLore()) {
 			return false;
 		}
-		List<String> lore = item.getItemMeta().getLore();
-		List<String> plore = getChocoLore();
+		List<String> lore2 = item.getItemMeta().getLore();
+		List<String> lore1 = getChocoLore();
 
 		// 比較
-		return lore.containsAll(plore);
+		return lore2.containsAll(lore1);
 	}
 
 	// アイテム使用時の処理
 	private static void useChoco(Player player, ItemStack item) {
+		// FIXME: BAD NAME
+		String a = player.getName();
+		// FIXME: BAD NAME
+		String b = getChocoOwner(item);
 		List<String> msg = Arrays.asList(
-				player.getName() + "は" + getChocoOwner(item) + "のチョコレートを食べた！猟奇的な味だった。",
-				player.getName() + "！" + getChocoOwner(item) + "からのチョコだと思ったかい？ざぁんねんっ！",
-				player.getName() + "は" + getChocoOwner(item) + "のプレゼントで鼻血が止まらない！（計画通り）",
-				player.getName() + "は" + getChocoOwner(item) + "のチョコレートを頬張ったまま息絶えた！",
-				player.getName() + "は" + getChocoOwner(item) + "のチョコにアレが入っているとはを知らずに食べた…",
-				player.getName() + "は" + getChocoOwner(item) + "のチョコなんか食ってないであくしろはたらけ",
-				getChocoOwner(item) + "は" + player.getName() + "に日頃の恨みを晴らした！スッキリ！",
-				getChocoOwner(item) + "による" + player.getName() + "への痛恨の一撃！ハッピーヴァレンタインッ！",
-				getChocoOwner(item) + "は" + player.getName() + "が食べる姿を、満面の笑みで見つめている！",
-				getChocoOwner(item) + "は悪くない！" + player.getName() + "が悪いんだっ！",
-				getChocoOwner(item) + "は" + player.getName() + "を討伐した！",
-				"こうして" + getChocoOwner(item) + "のイタズラでまた1人" + player.getName() + "が社畜となった。",
-				"おい聞いたか！" + getChocoOwner(item) + "が" + player.getName() + "にチョコ送ったらしいぞー！");
+				a + "は" + b + "のチョコレートを食べた！猟奇的な味だった。",
+				a + "！" + b + "からのチョコだと思ったかい？ざぁんねんっ！",
+				a + "は" + b + "のプレゼントで鼻血が止まらない！（計画通り）",
+				a + "は" + b + "のチョコレートを頬張ったまま息絶えた！",
+				a + "は" + b + "のチョコにアレが入っているとはを知らずに食べた…",
+				a + "は" + b + "のチョコなんか食ってないであくしろはたらけ",
+				b + "は" + a + "に日頃の恨みを晴らした！スッキリ！",
+				b + "による" + a + "への痛恨の一撃！ハッピーヴァレンタインッ！",
+				b + "は" + a + "が食べる姿を、満面の笑みで見つめている！",
+				b + "は悪くない！" + a + "が悪いんだっ！",
+				b + "は" + a + "を討伐した！",
+				"こうして" + b + "のイタズラでまた1人" + a + "が社畜となった。",
+				"おい聞いたか！" + b + "が" + a + "にチョコ送ったらしいぞー！");
 		if (isChocoOwner(item, player.getName())) {
 			// HP最大値アップ
 			player.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 12000, 10));
@@ -262,7 +264,7 @@ public class Valentine implements Listener {
 
 	private static boolean isChocoOwner(ItemStack item, String owner) {
 		String maker = getChocoOwner(item);
-		System.out.println(maker + owner);
+		SeasonalEvents.getInstance().getLogger().info(maker + owner);
 		return maker.equals(owner);
 	}
 
@@ -277,15 +279,16 @@ public class Valentine implements Listener {
 	}
 
 	private static List<String> getChocoLore() {
-		List<String> lore = new ArrayList<String>();
-		lore.add("");
-		lore.add(ChatColor.RESET + "" + ChatColor.GRAY + "手作りのチョコチップクッキー。");
-		lore.add(ChatColor.RESET + "" + ChatColor.GRAY + "食べると一定時間ステータスが変化する。");
-		lore.add(ChatColor.RESET + "" + ChatColor.GRAY + "賞味期限を超えると効果が無くなる。");
-		lore.add("");
-		lore.add(ChatColor.RESET + "" + ChatColor.DARK_GREEN + "賞味期限：" + FINISHDISP);
-		lore.add(ChatColor.RESET + "" + ChatColor.AQUA + "ステータス変化（10分）" + ChatColor.GRAY + " （期限内）");
-		return lore;
+		// 日付が関わるのでインライン化はしない
+		return Collections.unmodifiableList(Arrays.asList(
+				"",
+				ChatColor.RESET + "" + ChatColor.GRAY + "手作りのチョコチップクッキー。",
+				ChatColor.RESET + "" + ChatColor.GRAY + "食べると一定時間ステータスが変化する。",
+				ChatColor.RESET + "" + ChatColor.GRAY + "賞味期限を超えると効果が無くなる。",
+				"",
+				ChatColor.RESET + "" + ChatColor.DARK_GREEN + "賞味期限：" + FINISHDISP,
+				ChatColor.RESET + "" + ChatColor.AQUA + "ステータス変化（10分）" + ChatColor.GRAY + " （期限内）"
+		));
 	}
 
 	private static final String CHOCO_HEAD = ChatColor.RESET + "" + ChatColor.DARK_GREEN + "製作者：";
@@ -304,7 +307,7 @@ public class Valentine implements Listener {
 	}
 
 	private static String getChocoOwner(ItemStack item) {
-		String owner = "名称未設定";
+		String owner = null;
 		try {
 			List<String> lore = item.getItemMeta().getLore();
 			String ownerRow = lore.get(lore.size() - 1);
@@ -313,6 +316,6 @@ public class Valentine implements Listener {
 			}
 		} catch (NullPointerException e) {
 		}
-		return owner;
+		return owner == null ? "名称未設定" : owner;
 	}
 }

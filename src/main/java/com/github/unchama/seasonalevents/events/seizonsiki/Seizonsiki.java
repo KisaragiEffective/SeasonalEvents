@@ -2,10 +2,12 @@ package com.github.unchama.seasonalevents.events.seizonsiki;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.time.Instant;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalField;
+import java.time.temporal.TemporalUnit;
+import java.util.*;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -30,11 +32,22 @@ import com.github.unchama.seichiassist.data.PlayerData;
 public class Seizonsiki implements Listener {
 	private static boolean isdrop = false;
 	private static final String DROPDAY = "2017-01-16";
-	private static final String DROPDAYDISP = "2017/01/15";
+	private static final String DROPDAYDISP = calcYesterday(DROPDAY);
 	private static final String FINISH = "2017-01-22";
-	private static final String FINISHDISP = "2017/01/21";
+	private static final String FINISHDISP = calcYesterday(FINISH);
 
-	public Seizonsiki(SeasonalEvents parent) {
+	private final SeasonalEvents plugin = SeasonalEvents.getInstance();
+
+	// yyyy/MM/dd
+	public static String calcYesterday(String s) {
+		try {
+			Instant ins = new SimpleDateFormat("yyyy-MM-dd").parse(s).toInstant().minus(1, ChronoUnit.DAYS);
+			return ins.get(ChronoField.YEAR) + "/" + ins.get(ChronoField.MONTH_OF_YEAR) + "/" + ins.get(ChronoField.DAY_OF_MONTH);
+		} catch (ParseException e) {
+			throw new RuntimeException("フォーマットが正しくありません！", e);
+		}
+	}
+	public Seizonsiki() {
 		try {
 			// イベント開催中か判定
 			Date now = new Date();
@@ -43,7 +56,7 @@ public class Seizonsiki implements Listener {
 			Date dropdate = format.parse(DROPDAY);
 			if (now.before(finishdate)) {
 				// リスナーを登録
-				parent.getServer().getPluginManager().registerEvents(this, parent);
+				Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
 			}
 			if (now.before(dropdate)) {
 				isdrop = true;
@@ -56,7 +69,7 @@ public class Seizonsiki implements Listener {
 	@EventHandler
 	public void onEntityDeath(EntityDeathEvent event) {
 		if (event.getEntity().getType().equals(EntityType.ZOMBIE) &&
-				(event.getEntity().getKiller() != null)) {
+				event.getEntity().getKiller() != null) {
 			killEvent(event.getEntity().getKiller(), event.getEntity().getLocation());
 		}
 	}
@@ -77,10 +90,11 @@ public class Seizonsiki implements Listener {
 		}
 	}
 
-	// プレイヤーにゾンビが倒されたとき発生
+	/** ゾンビがプレイヤーに倒されたとき発生 */
 	private void killEvent(Player killer, Location loc) {
 		if (isdrop) {
 			double dp = SeasonalEvents.config.getDropPer();
+			// 0.0 - 100.0
 			double rand = Math.random() * 100;
 			if (rand < dp) {
 				// 報酬をドロップ
@@ -123,16 +137,16 @@ public class Seizonsiki implements Listener {
 	}
 
 	private List<String> getPrizeLore() {
-		List<String> lore = new ArrayList<String>();
-		lore.add("");
-		lore.add(ChatColor.RESET + "" +  ChatColor.GRAY + "成ゾン式で暴走していたチャラゾンビから没収した。");
-		lore.add(ChatColor.RESET + "" +  ChatColor.GRAY + "ゾンビたちが栽培しているりんご。");
-		lore.add(ChatColor.RESET + "" +  ChatColor.GRAY + "良質な腐葉土で1つずつ大切に育てられた。");
-		lore.add(ChatColor.RESET + "" +  ChatColor.GRAY + "栄養豊富で、食べるとマナが10%回復する。");
-		lore.add(ChatColor.RESET + "" +  ChatColor.GRAY + "腐りやすいため賞味期限を超えると効果が無くなる。");
-		lore.add("");
-		lore.add(ChatColor.RESET + "" +  ChatColor.DARK_GREEN + "賞味期限：" + FINISHDISP);
-		lore.add(ChatColor.RESET + "" +  ChatColor.AQUA + "マナ回復（10％）" + ChatColor.GRAY + " （期限内）");
-		return lore;
+		return Collections.unmodifiableList(Arrays.asList(
+				"",
+				ChatColor.RESET + "" +  ChatColor.GRAY + "成ゾン式で暴走していたチャラゾンビから没収した。",
+				ChatColor.RESET + "" +  ChatColor.GRAY + "ゾンビたちが栽培しているりんご。",
+				ChatColor.RESET + "" +  ChatColor.GRAY + "良質な腐葉土で1つずつ大切に育てられた。",
+				ChatColor.RESET + "" +  ChatColor.GRAY + "栄養豊富で、食べるとマナが10%回復する。",
+				ChatColor.RESET + "" +  ChatColor.GRAY + "腐りやすいため賞味期限を超えると効果が無くなる。",
+				"",
+				ChatColor.RESET + "" +  ChatColor.DARK_GREEN + "賞味期限：" + FINISHDISP,
+				ChatColor.RESET + "" +  ChatColor.AQUA + "マナ回復（10％）" + ChatColor.GRAY + " （期限内）"
+		));
 	}
 }
